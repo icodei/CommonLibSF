@@ -29,6 +29,7 @@
 #include "RE/B/BGSSkinForm.h"
 #include "RE/B/BGSSnapTemplateComponent.h"
 #include "RE/B/BGSTerminal.h"
+#include "RE/B/BSAnimNoteListener.h"
 #include "RE/B/BSFixedString.h"
 #include "RE/B/BSInputEventReceiver.h"
 #include "RE/B/BSIntrusiveRefCounted.h"

@@ -22,8 +22,8 @@ use ctrl ^ c to exit
 
 $workspace = Resolve-Path "$PSScriptRoot/../"
 Push-Location $workspace
-$include = "$workspace/CommonLibSF/include/RE"
-$src = "$workspace/CommonLibSF/src/RE"
+$include = "$workspace/include/RE"
+$src = "$workspace/src/RE"
 
 
 function Modify-File {
