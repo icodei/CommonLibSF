@@ -86,6 +86,11 @@ The main requirement of this license is: if you link your mod against CommonLibS
     </a>
   </td>
   <td align="center">
+    <a href="https://github.com/icodei" title="Sam">
+      <img src="https://avatars.githubusercontent.com/u/46335475?v=4" width="50;" alt="Sam"/>
+    </a>
+  </td>
+  <td align="center">
     <a href="https://github.com/alandtse" title="Alan Tse">
       <img src="https://avatars.githubusercontent.com/u/7086117?v=4" width="50;" alt="Alan Tse"/>
     </a>
