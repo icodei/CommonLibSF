@@ -1,18 +1,18 @@
 # CommonLibSF
 
-## A collaborative reverse-engineered library for Starfield.
+## A collaborative reverse-engineered library for Starfield
 
 [![C++23](https://img.shields.io/static/v1?label=standard&message=c%2B%2B23&color=blue&logo=c%2B%2B&&logoColor=red&style=flat)](https://en.cppreference.com/w/cpp/compiler_support)
 ![Platform](https://img.shields.io/static/v1?label=platform&message=windows&color=dimgray&style=flat&logo=windows)
-[![Game version](https://img.shields.io/badge/game%20version-1.7.29-orange)](#Developing-with-CommonLibSF)
-[![VCPKG_VER](https://img.shields.io/static/v1?label=vcpkg%20registry&message=2023-09-25.1&color=green&style=flat)](https://github.com/Starfield-Reverse-Engineering/Starfield-RE-vcpkg)
+[![Game version](https://img.shields.io/badge/game%20version-1.7.36-orange)](#Developing-with-CommonLibSF)
+[![VCPKG_VER](https://img.shields.io/static/v1?label=vcpkg%20registry&message=2023-10-14&color=green&style=flat)](https://github.com/Starfield-Reverse-Engineering/Starfield-RE-vcpkg)
 [![Main CI](https://img.shields.io/github/actions/workflow/status/Starfield-Reverse-Engineering/CommonLibSF/main_ci.yml)](https://github.com/Starfield-Reverse-Engineering/CommonLibSF/actions/workflows/main_ci.yml)
 
 ## Build Dependencies
 
 - [CMake v3.26+](https://cmake.org/) or [XMake v2.8.2+](https://github.com/xmake-io/xmake/releases)
   - Add this to your PATH
-- [vcpkg](https://github.com/microsoft/vcpkg)
+- [vcpkg](https://github.com/microsoft/vcpkg) (CMake)
   - Add the environment variable `VCPKG_ROOT` with the value as the path to the folder containing vcpkg
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) with "Desktop development with C++"
   - clang-cl toolset and build support if using `clang-cl` configuration
@@ -22,69 +22,25 @@
 
 ### Using the CommonLibSF plugin templates
 
-You can choose from the following community plugin templates to speed up the setup process:
-
 - [CLibSFPluginTemplate](https://github.com/Starfield-Reverse-Engineering/CLibSFPluginTemplate)
-  - Uses **CMake**. Consumes CommonLibSF as a [vcpkg port package](https://github.com/Starfield-Reverse-Engineering/Starfield-RE-vcpkg) or git submodule.
+  - Uses **CMake**. Consumes CommonLibSF as a [vcpkg port package](https://github.com/Starfield-Reverse-Engineering/Starfield-RE-vcpkg), a git submodule, or a local fork.
 - [SF_PluginTemplate](https://github.com/gottyduke/SF_PluginTemplate)
-  - Uses **CMake**. Consumes CommonLibSF as a git submodule or local fork.
+  - Uses **CMake**. Consumes CommonLibSF as a git submodule or a local fork.
 - [commonlibsf-template-xmake](https://github.com/Starfield-Reverse-Engineering/commonlibsf-template-xmake)
-  - Uses **XMake**. Consumes CommonLibSF as an [xrepo package](https://github.com/Starfield-Reverse-Engineering/commonlibsf-xrepo).
+  - Uses **XMake**. Consumes CommonLibSF as an [xrepo package](https://github.com/Starfield-Reverse-Engineering/commonlibsf-xrepo), a git submodule, or a local fork.
 
-### Including CommonLibSF in your project
-
-#### vcpkg
-
-[Instructions for consuming CommonLibSF using vcpkg are provided at our vcpkg registry repo.](https://github.com/Starfield-Reverse-Engineering/Starfield-RE-vcpkg)
-
-#### xrepo
-
-> Thanks to Qudix for maintaining the custom xmake repo!
-
-Add the following to your `xmake.lua`:
-
-```lua
--- add commonlibsf-xrepo repository
-add_repositories("re https://github.com/Starfield-Reverse-Engineering/commonlibsf-xrepo")
-
--- require package dependencies
-add_requires("commonlibsf")
-
-target("name")
-...
-    -- bind packages to the target
-    add_packages("commonlibsf")
-```
-
-#### git submodule
-
-To consume CommonLibSF as a submodule, `cd` into your project directory and run:
-
-```ps
-git submodule add https://github.com/Starfield-Reverse-Engineering/CommonLibSF extern/CommonLibSF
-git submodule update -f --init
-```
-
-Then add the following to your `CMakeLists.txt`:
-
-```cmake
-add_subdirectory(extern/CommonLibSF)
-target_link_libraries(
-  ${PROJECT_NAME}
-  PRIVATE
-  CommonLibSF::CommonLibSF
-)
-```
-
-**NOTE**: You may also use the [custom `add_commonlibsf_plugin` command](https://github.com/Starfield-Reverse-Engineering/CommonLibSF/wiki/Miscellanous-Explanatory-Stuff#custom-cmake-command) instead of `target_link_libraries`.
+### Please see the [Using CommonLibSF wiki page](https://github.com/Starfield-Reverse-Engineering/CommonLibSF/wiki/Using-CommonLibSF) for more information about using CommonLibSF.
 
 ## End-User Dependencies
 
-[Starfield Script Extender](https://www.nexusmods.com/starfield/mods/106)
+- [Starfield Script Extender](https://www.nexusmods.com/starfield/mods/106)
+- [Address Library for SFSE Plugins](https://www.nexusmods.com/starfield/mods/3256)
 
 ## Notes
 
-CommonLibSF is incompatible with SFSE and is intended to replace it as a static dependency&mdash;the runtime component is still required.
+CommonLibSF is intended to replace SFSE as a static dependency. However, the runtime component of SFSE is still required.
+
+You may download the PDB for the latest build of CommonLibSF via the [Update PDB](https://github.com/Starfield-Reverse-Engineering/CommonLibSF/actions/workflows/update_pdb.yml) workflow. This is useful for importing the latest type information into IDA using the "import PDB" feature.
 
 ## License
 
@@ -140,8 +96,33 @@ The main requirement of this license is: if you link your mod against CommonLibS
     </a>
   </td>
   <td align="center">
+    <a href="https://github.com/Bobbyclue" title="Bobbyclue">
+      <img src="https://avatars.githubusercontent.com/u/97621924?v=4" width="50;" alt="Bobbyclue"/>
+    </a>
+  </td>
+  <td align="center">
+    <a href="https://github.com/gazzamc" title="Gary McGovern">
+      <img src="https://avatars.githubusercontent.com/u/7975925?v=4" width="50;" alt="Gary McGovern"/>
+    </a>
+  </td>
+  <td align="center">
+    <a href="https://github.com/ianpatt" title="Ian Patterson">
+      <img src="https://avatars.githubusercontent.com/u/292795?v=4" width="50;" alt="Ian Patterson"/>
+    </a>
+  </td>
+  <td align="center">
+    <a href="https://github.com/lStewieAl" title="lStewieAl">
+      <img src="https://avatars.githubusercontent.com/u/16544747?v=4" width="50;" alt="lStewieAl"/>
+    </a>
+  </td>
+  <td align="center">
     <a href="https://github.com/nikitalita" title="nikitalita">
       <img src="https://avatars.githubusercontent.com/u/69168929?v=4" width="50;" alt="nikitalita"/>
+    </a>
+  </td>
+  <td align="center">
+    <a href="https://github.com/shad0wshayd3" title="shad0wshayd3">
+      <img src="https://avatars.githubusercontent.com/u/2724172?v=4" width="50;" alt="shad0wshayd3"/>
     </a>
   </td>
 </tr></table><!--CONTRIBUTORS_END-->

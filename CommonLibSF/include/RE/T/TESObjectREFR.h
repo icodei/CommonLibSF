@@ -1,12 +1,15 @@
 #pragma once
 
 #include "RE/A/ActorValueOwner.h"
+#include "RE/B/BGSInventoryList.h"
+#include "RE/B/BSLock.h"
 #include "RE/B/BSTEvent.h"
 #include "RE/I/IAnimationGraphManagerHolder.h"
 #include "RE/I/IKeywordFormBase.h"
 #include "RE/I/IMovementInterface.h"
 #include "RE/I/IPostAnimationChannelUpdateFunctor.h"
 #include "RE/N/NiPoint3.h"
+#include "RE/N/NiSmartPointer.h"
 #include "RE/T/TESHandleForm.h"
 
 namespace RE
@@ -16,20 +19,18 @@ namespace RE
 	class BGSScene;
 	class BSAnimationGraphEvent;
 	class BSTransformDeltaEvent;
+	class NiAVObject;
 	class TESBoundObject;
+	class TESModel;
 	class TESObjectCELL;
 	class TESRace;
 	class TESTopicInfo;
 	class TESWorldSpace;
+	class TESWaterForm;
 
 	namespace ActorValueEvents
 	{
 		struct ActorValueChangedEvent;
-	}
-
-	namespace BGSInventoryListEvent
-	{
-		struct Event;
 	}
 
 	class IMovementProcessMessageInterface :
@@ -47,11 +48,25 @@ namespace RE
 	{
 	public:
 		// members
-		NiPoint3A       angle;            // 00
-		NiPoint3A       location;         // 10
-		TESBoundObject* objectReference;  // 20
+		NiPoint3A                 angle;            // 00
+		NiPoint3A                 location;         // 10
+		NiPointer<TESBoundObject> objectReference;  // 20 - ref counted in SetObjectReference vfunc
 	};
 	static_assert(sizeof(OBJ_REFR) == 0x30);
+
+	struct LOADED_REF_DATA
+	{
+	public:
+		// members
+		void*                 handleList;           // 00 - TODO
+		NiPointer<NiAVObject> data3D;               // 08
+		TESWaterForm*         currentWaterType;     // 10
+		float                 relevantWaterHeight;  // 18
+		float                 cachedRadius;         // 1C
+		std::uint32_t         flags;                // 20
+		std::uint16_t         underwaterCount;      // 24
+	};
+	static_assert(sizeof(LOADED_REF_DATA) == 0x28);
 
 	class TESObjectREFR :
 		public TESHandleForm,                                            // 00
@@ -94,7 +109,7 @@ namespace RE
 		virtual void         Unk_75();                                                                                                                          // 075
 		virtual void         Unk_76();                                                                                                                          // 076
 		virtual void         Unk_77();                                                                                                                          // 077
-		virtual void         Unk_78();                                                                                                                          // 078
+		virtual bool         IsInZeroGravity();                                                                                                                 // 078
 		virtual void         Unk_79();                                                                                                                          // 079
 		virtual BGSScene*    GetCurrentScene() const;                                                                                                           // 07A
 		virtual void         Unk_7B();                                                                                                                          // 07B
@@ -149,7 +164,7 @@ namespace RE
 		virtual void         Unk_AC();                                                                                                                          // 0AC - Get3D(NiPointer<NiAVObject>&)?
 		virtual void         Unk_AD();                                                                                                                          // 0AD
 		virtual void         Unk_AE();                                                                                                                          // 0AE
-		virtual void         Unk_AF();                                                                                                                          // 0AF
+		virtual TESModel*    GetTESModel() const;                                                                                                               // 0AF
 		virtual TESRace*     GetVisualsRace() const;                                                                                                            // 0B0
 		virtual void         Unk_B1();                                                                                                                          // 0B1
 		virtual void         Unk_B2();                                                                                                                          // 0B2
@@ -221,7 +236,7 @@ namespace RE
 		virtual void         Unk_F4();                                                                                                                          // 0F4
 		virtual void         Unk_F5();                                                                                                                          // 0F5
 		virtual void         Unk_F6();                                                                                                                          // 0F6
-		virtual void         Unk_F7();                                                                                                                          // 0F7
+		virtual void         SetObjectReference(TESBoundObject* a_object, bool a_clearData);                                                                    // 0F7
 		virtual void         Unk_F8();                                                                                                                          // 0F8
 		virtual void         Unk_F9();                                                                                                                          // 0F9
 		virtual void         Unk_FA();                                                                                                                          // 0FA
@@ -242,7 +257,7 @@ namespace RE
 		virtual void         Unk_109();                                                                                                                         // 109
 		virtual void         Unk_10A();                                                                                                                         // 10A
 		virtual void         Unk_10B();                                                                                                                         // 10B
-		virtual void         Unk_10C();                                                                                                                         // 10C
+		virtual void         SetParentCell(TESObjectCELL* a_cell);                                                                                              // 10C
 		virtual bool         IsDead(bool a_notEssential) const;                                                                                                 // 10D
 		virtual bool         ProcessInWater(std::uint32_t a_bodyID, float a_waterHeight, float a_deltaTime);                                                    // 10E
 		virtual void         Unk_10F();                                                                                                                         // 10F
@@ -283,8 +298,8 @@ namespace RE
 		[[nodiscard]] constexpr float       GetAngleX() const { return data.angle.x; }
 		[[nodiscard]] constexpr float       GetAngleY() const { return data.angle.y; }
 		[[nodiscard]] constexpr float       GetAngleZ() const { return data.angle.z; }
-		[[nodiscard]] TESBoundObject*       GetBaseObject() { return data.objectReference; }
-		[[nodiscard]] const TESBoundObject* GetBaseObject() const { return data.objectReference; };
+		[[nodiscard]] TESBoundObject*       GetBaseObject() { return data.objectReference.get(); }
+		[[nodiscard]] const TESBoundObject* GetBaseObject() const { return data.objectReference.get(); }
 		[[nodiscard]] BGSLocation*          GetCurrentLocation();
 		[[nodiscard]] TESObjectREFR*        GetLinkedRef(BGSKeyword* a_keyword);
 		[[nodiscard]] TESWorldSpace*        GetParentWorldSpace();
@@ -300,25 +315,20 @@ namespace RE
 		[[nodiscard]] bool                  IsCrimeToActivate();
 		[[nodiscard]] bool                  IsInSpace(bool a_arg1);
 		[[nodiscard]] bool                  IsSpaceshipDocked();
+		[[nodiscard]] bool                  IsSpaceshipLanded();
 
 		// members
-		std::uint32_t  unk80;          // 80
-		std::uint32_t  unk84;          // 84
-		std::uint64_t  unk88;          // 88
-		std::uint64_t  unk90;          // 90
-		std::uint32_t  unk98;          // 98
-		std::uint8_t   pad9C[4];       // 9C
-		OBJ_REFR       data;           // A0
-		std::uint64_t  unkD0;          // D0
-		std::uint64_t  unkD8;          // D8
-		TESObjectCELL* parentCell;     // E0
-		void*          loadedData;     // E8
-		std::uint64_t  unkF0;          // F0
-		std::uint64_t  extraDataList;  // F8
-		std::uint64_t  unk100;         // 100
-		std::uint16_t  scale;          // 108
-		std::uint8_t   unk10A;         // 10A
-		std::uint8_t   unk10B;         // 10B
+		OBJ_REFR                data;               // 0A0
+		BGSInventoryList*       inventoryList;      // 0D0 - this + lock is one struct?
+		mutable BSReadWriteLock inventoryListLock;  // 0D8
+		TESObjectCELL*          parentCell;         // 0E0
+		LOADED_REF_DATA*        loadedData;         // 0E8 - same as above
+		mutable BSReadWriteLock loadedDataLock;     // 0F0
+		std::uint64_t           extraDataList;      // 0F8
+		BGSLocalizedString      unk100;             // 100 - empty?
+		std::uint16_t           scale;              // 108
+		bool                    unk10A;             // 10A
+		std::uint8_t            flags;              // 10B
 	};
 	static_assert(sizeof(TESObjectREFR) == 0x110);
 }

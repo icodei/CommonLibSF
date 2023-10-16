@@ -2,12 +2,12 @@
 
 namespace REL
 {
-	constexpr Version::Version(std::string_view a_version)
+	constexpr Version::Version(const std::string_view a_version)
 	{
 		std::array<value_type, 4> powers{ 1, 1, 1, 1 };
-		std::size_t               position = 0;
-		for (std::size_t i = 0; i < a_version.size(); ++i) {
-			if (a_version[i] == '.') {
+		std::size_t               position{};
+		for (const auto& c : a_version) {
+			if (c == '.') {
 				if (++position == powers.size()) {
 					throw std::invalid_argument("Too many parts in version number.");
 				}
@@ -16,32 +16,32 @@ namespace REL
 			}
 		}
 		position = 0;
-		for (std::size_t i = 0; i < a_version.size(); ++i) {
-			if (a_version[i] == '.') {
+		for (const auto& c : a_version) {
+			if (c == '.') {
 				++position;
-			} else if (a_version[i] < '0' || a_version[i] > '9') {
+			} else if (c < '0' || c > '9') {
 				throw std::invalid_argument("Invalid character in version number.");
 			} else {
 				powers[position] /= 10;
-				_impl[position] += static_cast<value_type>((a_version[i] - '0') * powers[position]);
+				_impl[position] += static_cast<value_type>((c - '0') * powers[position]);
 			}
 		}
 	}
 
-	[[nodiscard]] std::optional<Version> get_file_version(stl::zwstring a_filename)
+	[[nodiscard]] std::optional<Version> get_file_version(const stl::zwstring a_filename)
 	{
-		std::uint32_t     dummy{ 0 };
+		std::uint32_t     dummy{};
 		std::vector<char> buf(WinAPI::GetFileVersionInfoSize(a_filename.data(), std::addressof(dummy)));
 		if (buf.empty()) {
 			return std::nullopt;
 		}
 
-		if (!WinAPI::GetFileVersionInfo(a_filename.data(), 0, static_cast<std::uint32_t>(buf.size()), buf.data())) {
+		if (!WinAPI::GetFileVersionInfo(a_filename.data(), 0, buf.size(), buf.data())) {
 			return std::nullopt;
 		}
 
-		void*         verBuf{ nullptr };
-		std::uint32_t verLen{ 0 };
+		void*         verBuf{};
+		std::uint32_t verLen{};
 		if (!WinAPI::VerQueryValue(buf.data(), L"\\StringFileInfo\\040904B0\\ProductVersion", std::addressof(verBuf), std::addressof(verLen))) {
 			return std::nullopt;
 		}
@@ -55,4 +55,4 @@ namespace REL
 
 		return version;
 	}
-}  // namespace REL
+}

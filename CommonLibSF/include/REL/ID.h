@@ -20,11 +20,11 @@ namespace REL
 		class memory_map
 		{
 		public:
-			memory_map() noexcept = default;
+			constexpr memory_map() noexcept = default;
 
-			memory_map(const memory_map&) = delete;
+			constexpr memory_map(const memory_map&) = delete;
 
-			memory_map(memory_map&& a_rhs) noexcept :
+			constexpr memory_map(memory_map&& a_rhs) noexcept :
 				_mapping(a_rhs._mapping),
 				_view(a_rhs._view)
 			{
@@ -34,9 +34,9 @@ namespace REL
 
 			~memory_map() { close(); }
 
-			memory_map& operator=(const memory_map&) = delete;
+			constexpr memory_map& operator=(const memory_map&) = delete;
 
-			memory_map& operator=(memory_map&& a_rhs) noexcept
+			constexpr memory_map& operator=(memory_map&& a_rhs) noexcept
 			{
 				if (this != std::addressof(a_rhs)) {
 					_mapping = a_rhs._mapping;
@@ -48,17 +48,17 @@ namespace REL
 				return *this;
 			}
 
-			[[nodiscard]] void* data() noexcept { return _view; }
+			[[nodiscard]] constexpr void* data() const noexcept { return _view; }
 
 			bool open(stl::zwstring a_name, std::size_t a_size);
 
 			bool create(stl::zwstring a_name, std::size_t a_size);
 
-			void close();
+			constexpr void close();
 
 		private:
-			void* _mapping{ nullptr };
-			void* _view{ nullptr };
+			void* _mapping{};
+			void* _view{};
 		};
 
 		class Offset2ID
@@ -66,12 +66,12 @@ namespace REL
 		public:
 			using value_type = mapping_t;
 			using container_type = std::vector<value_type>;
-			using size_type = typename container_type::size_type;
-			using const_iterator = typename container_type::const_iterator;
-			using const_reverse_iterator = typename container_type::const_reverse_iterator;
+			using size_type = container_type::size_type;
+			using const_iterator = container_type::const_iterator;
+			using const_reverse_iterator = container_type::const_reverse_iterator;
 
 			template <class ExecutionPolicy>
-			explicit Offset2ID(ExecutionPolicy&& a_policy)  //
+			explicit Offset2ID(ExecutionPolicy&& a_policy)
 				requires(std::is_execution_policy_v<std::decay_t<ExecutionPolicy>>);
 
 			Offset2ID() :
@@ -80,23 +80,23 @@ namespace REL
 
 			[[nodiscard]] std::uint64_t operator()(std::size_t a_offset) const;
 
-			[[nodiscard]] const_iterator begin() const noexcept { return _offset2id.begin(); }
+			[[nodiscard]] constexpr const_iterator begin() const noexcept { return _offset2id.begin(); }
 
-			[[nodiscard]] const_iterator cbegin() const noexcept { return _offset2id.cbegin(); }
+			[[nodiscard]] constexpr const_iterator cbegin() const noexcept { return _offset2id.cbegin(); }
 
-			[[nodiscard]] const_iterator end() const noexcept { return _offset2id.end(); }
+			[[nodiscard]] constexpr const_iterator end() const noexcept { return _offset2id.end(); }
 
-			[[nodiscard]] const_iterator cend() const noexcept { return _offset2id.cend(); }
+			[[nodiscard]] constexpr const_iterator cend() const noexcept { return _offset2id.cend(); }
 
-			[[nodiscard]] const_reverse_iterator rbegin() const noexcept { return _offset2id.rbegin(); }
+			[[nodiscard]] constexpr const_reverse_iterator rbegin() const noexcept { return _offset2id.rbegin(); }
 
-			[[nodiscard]] const_reverse_iterator crbegin() const noexcept { return _offset2id.crbegin(); }
+			[[nodiscard]] constexpr const_reverse_iterator crbegin() const noexcept { return _offset2id.crbegin(); }
 
-			[[nodiscard]] const_reverse_iterator rend() const noexcept { return _offset2id.rend(); }
+			[[nodiscard]] constexpr const_reverse_iterator rend() const noexcept { return _offset2id.rend(); }
 
-			[[nodiscard]] const_reverse_iterator crend() const noexcept { return _offset2id.crend(); }
+			[[nodiscard]] constexpr const_reverse_iterator crend() const noexcept { return _offset2id.crend(); }
 
-			[[nodiscard]] size_type size() const noexcept { return _offset2id.size(); }
+			[[nodiscard]] constexpr size_type size() const noexcept { return _offset2id.size(); }
 
 		private:
 			container_type _offset2id;
@@ -111,7 +111,7 @@ namespace REL
 			using reference = stream_type&;
 			using const_reference = const stream_type&;
 
-			istream_t(stl::zwstring a_filename, std::ios_base::openmode a_mode) :
+			istream_t(const stl::zwstring a_filename, const std::ios_base::openmode a_mode) :
 				_stream(a_filename.data(), a_mode)
 			{
 				stl_assert(_stream.is_open(),
@@ -120,7 +120,7 @@ namespace REL
 				_stream.exceptions(std::ios::badbit | std::ios::failbit | std::ios::eofbit);
 			}
 
-			void ignore(std::streamsize a_count)
+			void ignore(const std::streamsize a_count)
 			{
 				_stream.ignore(a_count);
 			}
@@ -149,22 +149,22 @@ namespace REL
 		public:
 			void read(istream_t& a_in);
 
-			[[nodiscard]] std::size_t address_count() const noexcept
+			[[nodiscard]] constexpr std::size_t address_count() const noexcept
 			{
-				return static_cast<std::size_t>(_addressCount);
+				return _addressCount;
 			}
 
-			[[nodiscard]] std::uint64_t pointer_size() const noexcept
+			[[nodiscard]] constexpr std::uint64_t pointer_size() const noexcept
 			{
-				return static_cast<std::uint64_t>(_pointerSize);
+				return _pointerSize;
 			}
 
-			[[nodiscard]] std::string_view name() const noexcept
+			[[nodiscard]] constexpr std::string_view name() const noexcept
 			{
 				return _name;
 			}
 
-			[[nodiscard]] Version version() const noexcept
+			[[nodiscard]] constexpr Version version() const noexcept
 			{
 				return _version;
 			}
@@ -172,10 +172,10 @@ namespace REL
 		private:
 			char          _name[20]{};
 			Version       _version;
-			std::uint32_t _pointerSize{ 0 };
-			std::uint32_t _addressCount{ 0 };
+			std::uint32_t _pointerSize{};
+			std::uint32_t _addressCount{};
 		};
-	}  // namespace database
+	}
 
 	class IDDatabase
 	{
@@ -205,17 +205,17 @@ namespace REL
 
 		friend class database::Offset2ID;
 
-		IDDatabase() = default;
-
-		IDDatabase(const IDDatabase&) = delete;
-
-		IDDatabase(IDDatabase&&) = delete;
+		constexpr IDDatabase() = default;
 
 		~IDDatabase() = default;
 
-		IDDatabase& operator=(const IDDatabase&) = delete;
+		constexpr IDDatabase(const IDDatabase&) = delete;
 
-		IDDatabase& operator=(IDDatabase&&) = delete;
+		constexpr IDDatabase(IDDatabase&&) = delete;
+
+		constexpr IDDatabase& operator=(const IDDatabase&) = delete;
+
+		constexpr IDDatabase& operator=(IDDatabase&&) = delete;
 
 		std::wstring addresslib_filename();
 
@@ -223,7 +223,7 @@ namespace REL
 
 		bool load_file(stl::zwstring a_filename, Version a_version, bool a_failOnError);
 
-		bool unpack_file(database::istream_t& a_in, database::header_t a_header, bool a_failOnError);
+		bool unpack_file(database::istream_t& a_in, const database::header_t& a_header, bool a_failOnError);
 
 		void clear()
 		{
@@ -232,8 +232,9 @@ namespace REL
 		}
 
 		static IDDatabase              _instance;
-		inline static std::atomic_bool _initialized{ false };
+		inline static std::atomic_bool _initialized{};
 		inline static std::mutex       _initLock;
+		inline static bool             _is_steam{};
 		database::memory_map           _mmap;
 		std::span<database::mapping_t> _id2offset;
 		Platform                       _platform{ Platform::kUnknown };
@@ -244,11 +245,11 @@ namespace REL
 	public:
 		constexpr ID() noexcept = default;
 
-		explicit constexpr ID(std::uint64_t a_id) noexcept :
+		explicit constexpr ID(const std::uint64_t a_id) noexcept :
 			_id(a_id)
 		{}
 
-		constexpr ID& operator=(std::uint64_t a_id) noexcept
+		constexpr ID& operator=(const std::uint64_t a_id) noexcept
 		{
 			_id = a_id;
 			return *this;
@@ -270,16 +271,16 @@ namespace REL
 		}
 
 	private:
-		[[nodiscard]] static std::uintptr_t base()
+		[[nodiscard]] static constexpr std::uintptr_t base()
 		{
 			return Module::get().base();
 		}
 
-		std::uint64_t _id{ 0 };
+		std::uint64_t _id{};
 	};
 
 	template <class ExecutionPolicy>
-	database::Offset2ID::Offset2ID(ExecutionPolicy&& a_policy)  //
+	database::Offset2ID::Offset2ID(ExecutionPolicy&& a_policy)
 		requires(std::is_execution_policy_v<std::decay_t<ExecutionPolicy>>)
 	{
 		const std::span<const mapping_t> id2offset = IDDatabase::get()._id2offset;
@@ -293,4 +294,4 @@ namespace REL
 				return a_lhs.offset < a_rhs.offset;
 			});
 	}
-}  // namespace REL
+}

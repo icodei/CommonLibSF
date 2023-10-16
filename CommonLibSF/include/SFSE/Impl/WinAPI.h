@@ -181,6 +181,8 @@ namespace SFSE::WinAPI
 	inline constexpr auto UNDNAME_NAME_ONLY{ 0x00001000u };
 	inline constexpr auto UNDNAME_NO_ARGUMENTS{ 0x00002000u };
 
+	using THREAD_START_ROUTINE = std::uint32_t(void* a_param);
+
 	struct CRITICAL_SECTION
 	{
 	public:
@@ -806,13 +808,21 @@ namespace SFSE::WinAPI
 		PROCESS_INFORMATION* a_procInfo) noexcept;
 
 	void* CreateRemoteThread(
-		void*                a_process,
-		SECURITY_ATTRIBUTES* a_threadAttr,
-		std::size_t          a_stackSize,
-		std::uint32_t (*a_startAddr)(void*),
-		void*          a_param,
-		std::uint32_t  a_flags,
-		std::uint32_t* a_threadId) noexcept;
+		void*                 a_process,
+		SECURITY_ATTRIBUTES*  a_threadAttr,
+		std::size_t           a_stackSize,
+		THREAD_START_ROUTINE* a_startAddr,
+		void*                 a_param,
+		std::uint32_t         a_flags,
+		std::uint32_t*        a_threadID) noexcept;
+
+	void* CreateThread(
+		SECURITY_ATTRIBUTES*  a_threadAttr,
+		std::size_t           a_stackSize,
+		THREAD_START_ROUTINE* a_startAddr,
+		void*                 a_param,
+		std::uint32_t         a_flags,
+		std::uint32_t*        a_threadID) noexcept;
 
 	std::uint32_t ExpandEnvironmentStrings(
 		const char*   a_src,
@@ -1067,6 +1077,9 @@ namespace SFSE::WinAPI
 	[[nodiscard]] std::int32_t ShowCursor(
 		bool a_show) noexcept;
 
+	void Sleep(
+		std::uint32_t a_milliseconds) noexcept;
+
 	bool TerminateProcess(
 		void*         a_process,
 		std::uint32_t a_exitCode) noexcept;
@@ -1178,7 +1191,7 @@ namespace SFSE::WinAPI
 		const void*  a_buffer,
 		std::size_t  a_bufferLen,
 		std::size_t* a_bufferWritten) noexcept;
-}  // namespace SFSE::WinAPI
+}
 
 #endif  // _INC_WINAPIFAMILY
 
@@ -1191,4 +1204,4 @@ namespace RE::DirectX
 		float m[4][4];
 	};
 	static_assert(sizeof(XMFLOAT4X4) == 0x40);
-}  // namespace RE::DirectX
+}

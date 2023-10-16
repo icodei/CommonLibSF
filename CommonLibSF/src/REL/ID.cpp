@@ -4,11 +4,7 @@ namespace REL
 {
 	namespace database
 	{
-		constexpr auto                                                             LookUpDir = "Data\\SFSE\\Plugins"sv;
-		constexpr std::array<std::pair<std::string_view, IDDatabase::Platform>, 2> VendorModule{
-			std::make_pair("steam_api64"sv, IDDatabase::Platform::kSteam),
-			std::make_pair("XGameRuntime"sv, IDDatabase::Platform::kMsStore),
-		};
+		constexpr auto LookUpDir = "Data\\SFSE\\Plugins"sv;
 
 		[[nodiscard]] std::uint64_t Offset2ID::operator()(std::size_t a_offset) const
 		{
@@ -28,11 +24,11 @@ namespace REL
 			return it->id;
 		}
 
-		bool memory_map::open(stl::zwstring a_name, std::size_t a_size)
+		bool memory_map::open(const stl::zwstring a_name, const std::size_t a_size)
 		{
 			close();
 
-			WinAPI::ULARGE_INTEGER bytes{};
+			WinAPI::ULARGE_INTEGER bytes;
 			bytes.value = a_size;
 
 			_mapping = WinAPI::OpenFileMapping(
@@ -60,11 +56,11 @@ namespace REL
 			return true;
 		}
 
-		bool memory_map::create(stl::zwstring a_name, std::size_t a_size)
+		bool memory_map::create(const stl::zwstring a_name, const std::size_t a_size)
 		{
 			close();
 
-			WinAPI::ULARGE_INTEGER bytes{};
+			WinAPI::ULARGE_INTEGER bytes;
 			bytes.value = a_size;
 
 			_mapping = WinAPI::OpenFileMapping(
@@ -100,10 +96,10 @@ namespace REL
 			return true;
 		}
 
-		void memory_map::close()
+		constexpr void memory_map::close()
 		{
 			if (_view) {
-				(void)WinAPI::UnmapViewOfFile(static_cast<const void*>(_view));
+				(void)WinAPI::UnmapViewOfFile(_view);
 				_view = nullptr;
 			}
 
@@ -142,12 +138,12 @@ namespace REL
 				_version[i] = static_cast<std::uint16_t>(version[i]);
 			}
 		}
-	}  // namespace database
+	}
 
 	[[nodiscard]] std::size_t IDDatabase::id2offset(std::uint64_t a_id) const
 	{
-		database::mapping_t elem{ a_id, 0 };
-		const auto          it = std::ranges::lower_bound(
+		const database::mapping_t elem{ a_id, 0 };
+		const auto                it = std::ranges::lower_bound(
             _id2offset,
             elem,
             [](auto&& a_lhs, auto&& a_rhs) {
@@ -161,7 +157,7 @@ namespace REL
 			"library for this version of the game, and thus does not support it."sv,
 			a_id, std::to_underlying(database::kDatabaseVersion));
 
-		return static_cast<std::size_t>(it->offset);
+		return it->offset;
 	}
 
 	std::wstring IDDatabase::addresslib_filename()
@@ -170,14 +166,14 @@ namespace REL
 		// sfse only loads plugins from { runtimeDirectory + "Data\\SFSE\\Plugins" }
 		auto file = std::filesystem::current_path();
 
-		file /= std::format("{}\\versionlib-{}", database::LookUpDir, version.string());
+		file /= std::format("{}\\versionlib-{}", database::LookUpDir, version.string("-"));
 
 		_platform = Platform::kUnknown;
-		for (auto& [vendor, registered] : database::VendorModule) {
-			if (WinAPI::GetModuleHandle(vendor.data())) {
-				_platform = registered;
-				break;
-			}
+		if (WinAPI::GetModuleHandle(L"steam_api64")) {
+			_platform = Platform::kSteam;
+			_is_steam = true;
+		} else {
+			_platform = Platform::kMsStore;
 		}
 
 		stl_assert(_platform != Platform::kUnknown,
@@ -186,12 +182,12 @@ namespace REL
 
 		// steam version omits the suffix
 		if (_platform != Platform::kSteam) {
-			file /= std::format("-{}", std::to_underlying(_platform));
+			file += std::format("-{}", std::to_underlying(_platform));
 		}
 		file += ".bin";
 
 		stl_assert(std::filesystem::exists(file),
-			"Failed to find address library file in directory.");
+			"Failed to find address library file: \n{}", file.string());
 
 		return file.wstring();
 	}
@@ -203,7 +199,7 @@ namespace REL
 		load_file(file, version, true);
 	}
 
-	bool IDDatabase::load_file(stl::zwstring a_filename, Version a_version, bool a_failOnError)
+	bool IDDatabase::load_file(const stl::zwstring a_filename, const Version a_version, const bool a_failOnError)
 	{
 		try {
 			database::istream_t in(a_filename.data(), std::ios::in | std::ios::binary);
@@ -219,17 +215,17 @@ namespace REL
 					a_failOnError);
 			}
 
-			auto mapname = stl::utf8_to_utf16(std::format(
+			const auto mapname = stl::utf8_to_utf16(std::format(
 				// kDatabaseVersion, runtimeVersion, runtimePlatform
 				"CommonLibSF-Offsets-v{}-{}-{}",
 				std::to_underlying(database::kDatabaseVersion),
-				a_version.string(),
+				a_version.string("-"),
 				std::to_underlying(_platform)));
 
 			stl_assert(mapname.has_value(),
 				"Failed to generate memory map name.");
 
-			const auto byteSize = static_cast<std::size_t>(header.address_count()) * sizeof(database::mapping_t);
+			const auto byteSize = header.address_count() * sizeof(database::mapping_t);
 			if (_mmap.open(mapname.value(), byteSize)) {
 				_id2offset = { static_cast<database::mapping_t*>(_mmap.data()), header.address_count() };
 			} else if (_mmap.create(mapname.value(), byteSize)) {
@@ -254,17 +250,16 @@ namespace REL
 					"then it is likely that address library has not yet added support "
 					"for this version of the game or this platform.\n"
 					"Current version: {}\n"
-					"Current vendor module: {}"sv,
+					"Current platform: {}"sv,
 					stl::utf16_to_utf8(a_filename).value_or("<unknown filename>"s),
 					a_version.string(),
-					database::VendorModule[std::to_underlying(_platform)].first),
+					_is_steam ? "Steam" : "Microsoft Store"),
 				a_failOnError);
-			return false;
 		}
 		return true;
 	}
 
-	bool IDDatabase::unpack_file(database::istream_t& a_in, database::header_t a_header, bool a_failOnError)
+	bool IDDatabase::unpack_file(database::istream_t& a_in, const database::header_t& a_header, const bool a_failOnError)
 	{
 		std::uint8_t  type = 0;
 		std::uint64_t id = 0;
@@ -349,4 +344,4 @@ namespace REL
 	}
 
 	IDDatabase IDDatabase::_instance;
-}  // namespace REL
+}

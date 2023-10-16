@@ -9,7 +9,7 @@ namespace RE
 	public:
 		SF_RTTI_VTABLE(PackageList);
 
-		virtual void Unk_00();
+		virtual ~PackageList();
 
 		// members
 		std::uint64_t unk08;  // 08
@@ -34,6 +34,15 @@ namespace RE
 	class TESAIForm : public BaseFormComponent
 	{
 	public:
+		SF_RTTI_VTABLE(TESAIForm);
+
+		~TESAIForm() override;
+
+		// override (BaseFormComponent)
+		const BSFixedString& GetFormComponentType() const override;  // 01 - { return "TESAIForm_Component"; }
+		void                 InitializeDataComponent() override;     // 02
+
+		// members
 		AIDATA_GAME aiData;      // 08
 		PackageList aiPackList;  // 18
 	};

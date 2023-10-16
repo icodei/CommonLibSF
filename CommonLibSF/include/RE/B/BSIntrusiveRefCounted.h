@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RE/M/MemoryManager.h"
+
 namespace RE
 {
 	struct BSIntrusiveRefCounted
@@ -7,8 +9,30 @@ namespace RE
 	public:
 		SF_RTTI(BSIntrusiveRefCounted);
 
-		volatile mutable std::uint32_t refCount{ 0 };  // 00
-		std::uint32_t                  unk04;          // 04
+		template <class>
+		friend struct BSTSmartPointerIntrusiveRefCount;
+
+		constexpr BSIntrusiveRefCounted() noexcept {}
+
+		std::uint32_t IncRef() const
+		{
+			stl::atomic_ref myRefCount{ _refCount };
+			return ++myRefCount;
+		}
+
+		std::uint32_t DecRef() const
+		{
+			stl::atomic_ref myRefCount{ _refCount };
+			return --myRefCount;
+		}
+
+		[[nodiscard]] constexpr std::uint32_t QRefCount() const noexcept { return _refCount; }
+
+		SF_HEAP_REDEFINE_NEW();
+
+	protected:
+		// members
+		mutable volatile std::uint32_t _refCount{};  // 0
 	};
-	static_assert(sizeof(BSIntrusiveRefCounted) == 0x08);
+	static_assert(sizeof(BSIntrusiveRefCounted) == 0x04);
 }

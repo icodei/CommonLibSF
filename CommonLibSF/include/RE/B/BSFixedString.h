@@ -41,7 +41,7 @@ namespace RE
 			}
 
 			template <class T>
-			BSFixedString(const T& a_string)  //
+			BSFixedString(const T& a_string)
 				requires(std::convertible_to<const T&, std::basic_string_view<value_type>> &&
 						 !std::convertible_to<const T&, const_pointer> &&
 						 !std::same_as<T, BSFixedString<value_type, true>> &&
@@ -86,7 +86,7 @@ namespace RE
 			}
 
 			template <class T>
-			BSFixedString& operator=(const T& a_string)  //
+			BSFixedString& operator=(const T& a_string)
 				requires(std::convertible_to<const T&, std::basic_string_view<value_type>> &&
 						 !std::convertible_to<const T&, const_pointer> &&
 						 !std::same_as<T, BSFixedString<value_type, true>> &&
@@ -193,7 +193,7 @@ namespace RE
 			static constexpr const value_type EMPTY[]{ 0 };
 
 			// members
-			BSStringPool::Entry* _data{ nullptr };  // 0
+			BSStringPool::Entry* _data{};  // 0
 		};
 
 		extern template class BSFixedString<char, false>;

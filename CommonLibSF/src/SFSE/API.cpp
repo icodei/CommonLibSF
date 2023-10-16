@@ -1,4 +1,5 @@
 #include "SFSE/API.h"
+
 #include "SFSE/Logger.h"
 
 namespace SFSE
@@ -14,30 +15,29 @@ namespace SFSE
 				return singleton;
 			}
 
-			PluginHandle  pluginHandle{ static_cast<PluginHandle>(-1) };
-			std::uint32_t releaseIndex{ 0 };
+			PluginHandle pluginHandle{ static_cast<PluginHandle>(-1) };
 
-			TrampolineInterface* trampolineInterface{ nullptr };
-
-			MessagingInterface* messagingInterface{ nullptr };
+			TrampolineInterface* trampolineInterface{};
+			MessagingInterface*  messagingInterface{};
+			MenuInterface*       menuInterface{};
 
 			std::mutex                         apiLock;
 			std::vector<std::function<void()>> apiInitRegs;
-			bool                               apiInit{ false };
+			bool                               apiInit{};
 
 		private:
 			APIStorage() noexcept = default;
-			APIStorage(const APIStorage&) = delete;
-			APIStorage(APIStorage&&) = delete;
-
 			~APIStorage() noexcept = default;
 
-			APIStorage& operator=(const APIStorage&) = delete;
-			APIStorage& operator=(APIStorage&&) = delete;
+			constexpr APIStorage(const APIStorage&) = delete;
+			constexpr APIStorage(APIStorage&&) = delete;
+
+			constexpr APIStorage& operator=(const APIStorage&) = delete;
+			constexpr APIStorage& operator=(APIStorage&&) = delete;
 		};
 
 		template <class T>
-		T* QueryInterface(const LoadInterface* a_intfc, std::uint32_t a_id)
+		constexpr T* QueryInterface(const LoadInterface* a_intfc, const std::uint32_t a_id)
 		{
 			auto result = static_cast<T*>(a_intfc->QueryInterface(a_id));
 			if (result && result->Version() > T::kVersion) {
@@ -45,9 +45,9 @@ namespace SFSE
 			}
 			return result;
 		}
-	}  // namespace detail
+	}
 
-	void Init(const LoadInterface* a_intfc, bool a_log) noexcept
+	void Init(const LoadInterface* a_intfc, const bool a_log) noexcept
 	{
 		stl_assert(a_intfc, "interface is null"sv);
 
@@ -65,6 +65,7 @@ namespace SFSE
 
 			storage.messagingInterface = detail::QueryInterface<MessagingInterface>(a_intfc, LoadInterface::kMessaging);
 			storage.trampolineInterface = detail::QueryInterface<TrampolineInterface>(a_intfc, LoadInterface::kTrampoline);
+			storage.menuInterface = detail::QueryInterface<MenuInterface>(a_intfc, LoadInterface::kMenu);
 
 			storage.apiInit = true;
 			auto& regs = storage.apiInitRegs;
@@ -76,7 +77,7 @@ namespace SFSE
 		}
 	}
 
-	void RegisterForAPIInitEvent(std::function<void()> a_fn)
+	void RegisterForAPIInitEvent(const std::function<void()>& a_fn)
 	{
 		{
 			auto&                  storage = detail::APIStorage::get();
@@ -90,13 +91,25 @@ namespace SFSE
 		a_fn();
 	}
 
-	PluginHandle GetPluginHandle() noexcept { return detail::APIStorage::get().pluginHandle; }
+	PluginHandle GetPluginHandle() noexcept
+	{
+		return detail::APIStorage::get().pluginHandle;
+	}
 
-	std::uint32_t GetReleaseIndex() noexcept { return detail::APIStorage::get().releaseIndex; }
+	const TrampolineInterface* GetTrampolineInterface() noexcept
+	{
+		return detail::APIStorage::get().trampolineInterface;
+	}
 
-	const TrampolineInterface* GetTrampolineInterface() noexcept { return detail::APIStorage::get().trampolineInterface; }
+	const MessagingInterface* GetMessagingInterface() noexcept
+	{
+		return detail::APIStorage::get().messagingInterface;
+	}
 
-	const MessagingInterface* GetMessagingInterface() noexcept { return detail::APIStorage::get().messagingInterface; }
+	const MenuInterface* GetMenuInterface() noexcept
+	{
+		return detail::APIStorage::get().menuInterface;
+	}
 
 	Trampoline& GetTrampoline()
 	{
@@ -104,11 +117,11 @@ namespace SFSE
 		return trampoline;
 	}
 
-	void AllocTrampoline(std::size_t a_size, bool a_trySFSEReserve)
+	void AllocTrampoline(const std::size_t a_size, const bool a_trySFSEReserve)
 	{
 		auto& trampoline = GetTrampoline();
-		if (auto intfc = GetTrampolineInterface(); intfc && a_trySFSEReserve) {
-			auto memory = intfc->AllocateFromBranchPool(a_size);
+		if (const auto intfc = GetTrampolineInterface(); intfc && a_trySFSEReserve) {
+			const auto memory = intfc->AllocateFromBranchPool(a_size);
 			if (memory) {
 				trampoline.set_trampoline(memory, a_size);
 				return;
@@ -117,4 +130,4 @@ namespace SFSE
 
 		trampoline.create(a_size);
 	}
-}  // namespace SFSE
+}

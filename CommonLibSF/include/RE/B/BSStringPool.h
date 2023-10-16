@@ -16,28 +16,25 @@ namespace RE
 			static void release(Entry*& a_entry)
 			{
 				using func_t = decltype(&Entry::release);
-				REL::Relocation<func_t> func{ REL::Offset(0x00836C2C) };
+				REL::Relocation<func_t> func{ REL::ID(36754) };
 				return func(a_entry);
 			}
 
-			void acquire()
+			std::uint32_t acquire()
 			{
-				_InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&_refCount), 1);
+				stl::atomic_ref refCount{ _refCount };
+				return ++refCount;
 			}
 
 			template <class T>
-			[[nodiscard]] const T* data() const noexcept;
-
-			template <>
-			[[nodiscard]] const char* data<char>() const noexcept
+			[[nodiscard]] const T* data() const noexcept
 			{
-				return u8();
-			}
-
-			template <>
-			[[nodiscard]] const wchar_t* data<wchar_t>() const noexcept
-			{
-				return u16();
+				const auto entry = leaf();
+				if (entry) {
+					return reinterpret_cast<const T*>(entry + 1);
+				} else {
+					return nullptr;
+				}
 			}
 
 			[[nodiscard]] const Entry* leaf() const noexcept
@@ -57,26 +54,6 @@ namespace RE
 
 			[[nodiscard]] bool          external() const noexcept { return _flags & kExternal; }
 			[[nodiscard]] std::uint32_t size() const noexcept { return length(); }
-
-			[[nodiscard]] const char* u8() const noexcept
-			{
-				const auto entry = leaf();
-				if (entry) {
-					return reinterpret_cast<const char*>(entry + 1);
-				} else {
-					return nullptr;
-				}
-			}
-
-			[[nodiscard]] const wchar_t* u16() const noexcept
-			{
-				const auto entry = leaf();
-				if (entry) {
-					return reinterpret_cast<const wchar_t*>(entry + 1);
-				} else {
-					return nullptr;
-				}
-			}
 
 			// members
 			Entry* _left;  // 00
@@ -108,7 +85,7 @@ namespace RE
 		static BucketTable& GetSingleton()
 		{
 			using func_t = decltype(&BucketTable::GetSingleton);
-			REL::Relocation<func_t> func{ REL::Offset(0x0314A870) };
+			REL::Relocation<func_t> func{ REL::ID(198241) };
 			return func();
 		}
 
@@ -126,7 +103,7 @@ namespace RE
 	inline void GetEntry<char>(BSStringPool::Entry*& a_result, const char* a_string, bool a_caseSensitive)
 	{
 		using func_t = decltype(&GetEntry<char>);
-		REL::Relocation<func_t> func{ REL::Offset(0x03149530) };
+		REL::Relocation<func_t> func{ REL::ID(198219) };
 		return func(a_result, a_string, a_caseSensitive);
 	}
 
@@ -134,7 +111,7 @@ namespace RE
 	inline void GetEntry<wchar_t>(BSStringPool::Entry*& a_result, const wchar_t* a_string, bool a_caseSensitive)
 	{
 		using func_t = decltype(&GetEntry<wchar_t>);
-		REL::Relocation<func_t> func{ REL::Offset(0x03149D40) };
+		REL::Relocation<func_t> func{ REL::ID(198220) };
 		return func(a_result, a_string, a_caseSensitive);
 	}
 }

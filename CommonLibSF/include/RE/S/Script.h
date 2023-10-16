@@ -80,9 +80,9 @@ namespace RE
 	{
 	public:
 		// members
-		const char*   paramName{ "" };    // 00
-		std::uint32_t paramType;          // 08 enumeration
-		bool          optional{ false };  // 0C
+		const char*   paramName{ "" };  // 00
+		std::uint32_t paramType;        // 08 enumeration
+		bool          optional{};       // 0C
 	};
 	static_assert(sizeof(SCRIPT_PARAMETER) == 0x10);
 
@@ -149,23 +149,45 @@ namespace RE
 
 		enum
 		{
-			kNumScriptCommands = 0x03C0,
 			kNumConsoleCommands = 0x0245,
+			kNumScriptCommands = 0x03C0,
 
-			kScriptOpBase = 0x1000,
 			kConsoleOpBase = 0x0100,
+			kScriptOpBase = 0x1000,
 		};
 
-		inline static SCRIPT_FUNCTION GetFirstScriptCommand()
+		inline static const auto GetConsoleCommands()
 		{
-			static REL::Relocation<SCRIPT_FUNCTION> chunk{ REL::Offset(0x05511F30) };
-			return chunk.get();
+			static REL::Relocation<SCRIPT_FUNCTION(*)[kNumConsoleCommands]> chunk{ REL::ID(841465) };
+			return std::span{ *chunk };
 		}
 
-		inline static SCRIPT_FUNCTION GetFirstConsoleCommand()
+		inline static const auto GetScriptCommands()
 		{
-			static REL::Relocation<SCRIPT_FUNCTION> chunk{ REL::Offset(0x055056C0) };
-			return chunk.get();
+			static REL::Relocation<SCRIPT_FUNCTION(*)[kNumScriptCommands]> chunk{ REL::ID(841467) };
+			return std::span{ *chunk };
+		}
+
+		inline static SCRIPT_FUNCTION* LocateConsoleCommand(const std::string_view a_longName)
+		{
+			for (auto& command : GetConsoleCommands()) {
+				if (std::strlen(command.functionName) == a_longName.size())
+					if (_strnicmp(command.functionName, a_longName.data(), a_longName.size()) == 0)
+						return std::addressof(command);
+			}
+
+			return nullptr;
+		}
+
+		inline static SCRIPT_FUNCTION* LocateScriptCommand(const std::string_view a_longName)
+		{
+			for (auto& command : GetScriptCommands()) {
+				if (std::strlen(command.functionName) == a_longName.size())
+					if (_strnicmp(command.functionName, a_longName.data(), a_longName.size()) == 0)
+						return std::addressof(command);
+			}
+
+			return nullptr;
 		}
 
 		// members
