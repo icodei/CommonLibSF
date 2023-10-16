@@ -42,6 +42,7 @@
 #include "RE/B/BGSTerminal.h"
 #include "RE/B/BGSTextureModel.h"
 #include "RE/B/BGSTypedKeywordValueArray.h"
+#include "RE/B/BSAnimNoteListener.h"
 #include "RE/B/BSContainer.h"
 #include "RE/B/BSFixedString.h"
 #include "RE/B/BSInputEventReceiver.h"

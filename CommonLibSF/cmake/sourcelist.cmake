@@ -1,17 +1,27 @@
 set(SOURCES
+	include/RE/A/AIProcess.h
 	include/RE/A/Actor.h
+	include/RE/A/ActorPackage.h
+	include/RE/A/ActorState.h
 	include/RE/A/ActorValueInfo.h
 	include/RE/A/ActorValueOwner.h
+	include/RE/A/ActorValueStorage.h
 	include/RE/A/ActorValues.h
+	include/RE/B/BGSAnimationGraphComponent.h
+	include/RE/B/BGSAttachParentArray.h
 	include/RE/B/BGSAttackDataForm.h
+	include/RE/B/BGSBipedObjectForm.h
+	include/RE/B/BGSBodyPartInfo.h
 	include/RE/B/BGSDestructibleObjectForm.h
 	include/RE/B/BGSEditorID.h
 	include/RE/B/BGSEntryPoint.h
 	include/RE/B/BGSForcedLocRefType.h
+	include/RE/B/BGSInventoryList.h
 	include/RE/B/BGSKeyword.h
 	include/RE/B/BGSKeywordForm.h
 	include/RE/B/BGSListForm.h
 	include/RE/B/BGSLocalizedString.h
+	include/RE/B/BGSLocalizedStringDL.h
 	include/RE/B/BGSLocation.h
 	include/RE/B/BGSLocationRefType.h
 	include/RE/B/BGSMod.h
@@ -20,52 +30,84 @@ set(SOURCES
 	include/RE/B/BGSOverridePackCollection.h
 	include/RE/B/BGSPerk.h
 	include/RE/B/BGSPerkRankArray.h
+	include/RE/B/BGSPreloadable.h
 	include/RE/B/BGSPreviewTransform.h
 	include/RE/B/BGSPropertySheet.h
 	include/RE/B/BGSScene.h
 	include/RE/B/BGSSkinForm.h
 	include/RE/B/BGSSnapTemplateComponent.h
 	include/RE/B/BGSTerminal.h
+	include/RE/B/BGSTextureModel.h
+	include/RE/B/BGSTypedKeywordValueArray.h
 	include/RE/B/BSAnimNoteListener.h
+	include/RE/B/BSContainer.h
 	include/RE/B/BSFixedString.h
 	include/RE/B/BSInputEventReceiver.h
+	include/RE/B/BSInputEventUser.h
 	include/RE/B/BSIntrusiveRefCounted.h
+	include/RE/B/BSLock.h
 	include/RE/B/BSReflection.h
 	include/RE/B/BSStringPool.h
 	include/RE/B/BSStringT.h
+	include/RE/B/BSTArray.h
 	include/RE/B/BSTEvent.h
 	include/RE/B/BSTList.h
 	include/RE/B/BSTSingleton.h
+	include/RE/B/BSTSmartPointer.h
 	include/RE/B/BaseFormComponent.h
+	include/RE/C/Color.h
 	include/RE/C/CombatGroup.h
+	include/RE/C/Console.h
 	include/RE/C/ConsoleLog.h
 	include/RE/E/ExtraDataTypes.h
 	include/RE/F/FORM_ENUM_STRING.h
+	include/RE/F/FactionRank.h
 	include/RE/F/FormTypes.h
+	include/RE/G/GameMenuBase.h
 	include/RE/I/IAnimationGraphManagerHolder.h
 	include/RE/I/IFunction.h
 	include/RE/I/IKeywordFormBase.h
+	include/RE/I/IMenu.h
 	include/RE/I/IMovementInterface.h
+	include/RE/I/IMovementPlayerControlsFilter.h
+	include/RE/I/IMovementState.h
+	include/RE/I/IMovementStateStore.h
 	include/RE/I/INIPrefSettingCollection.h
 	include/RE/I/INISettingCollection.h
 	include/RE/I/IPostAnimationChannelUpdateFunctor.h
+	include/RE/I/IStoreAnimationActions.h
+	include/RE/M/MagicTarget.h
 	include/RE/M/MemoryManager.h
 	include/RE/M/MenuOpenCloseEvent.h
 	include/RE/N/NativeFunction.h
 	include/RE/N/NativeFunctionBase.h
 	include/RE/N/NiPoint3.h
+	include/RE/N/NiSmartPointer.h
 	include/RE/Offsets.h
 	include/RE/Offsets_NiRTTI.h
 	include/RE/Offsets_RTTI.h
 	include/RE/Offsets_VTABLE.h
+	include/RE/P/PerkRankData.h
 	include/RE/P/PlayerCamera.h
+	include/RE/P/PlayerCharacter.h
 	include/RE/R/RegSettingCollection.h
 	include/RE/RTTI.h
+	include/RE/S/SWFToCodeFunctionHandler.h
+	include/RE/S/ScaleformGFxASMovieRootBase.h
+	include/RE/S/ScaleformGFxFileTypeConstants.h
+	include/RE/S/ScaleformGFxFunctionHandler.h
+	include/RE/S/ScaleformGFxMovie.h
+	include/RE/S/ScaleformGFxState.h
+	include/RE/S/ScaleformGFxStateBag.h
+	include/RE/S/ScaleformGFxValue.h
+	include/RE/S/ScaleformPtr.h
+	include/RE/S/ScaleformRefCount.h
 	include/RE/S/Script.h
+	include/RE/S/Setting.h
 	include/RE/S/SettingCollection.h
 	include/RE/S/SettingCollectionList.h
 	include/RE/S/SettingCollectionMap.h
-	include/RE/S/Settings.h
+	include/RE/S/Sexes.h
 	include/RE/Starfield.h
 	include/RE/T/TBO_InstanceData.h
 	include/RE/T/TESAIForm.h
@@ -75,11 +117,14 @@ set(SOURCES
 	include/RE/T/TESBoundObject.h
 	include/RE/T/TESCamera.h
 	include/RE/T/TESContainer.h
+	include/RE/T/TESDataHandler.h
+	include/RE/T/TESDescription.h
 	include/RE/T/TESFile.h
 	include/RE/T/TESForm.h
 	include/RE/T/TESFormRefCount.h
 	include/RE/T/TESFullName.h
 	include/RE/T/TESHandleForm.h
+	include/RE/T/TESModel.h
 	include/RE/T/TESNPC.h
 	include/RE/T/TESObject.h
 	include/RE/T/TESObjectARMO.h
@@ -90,12 +135,15 @@ set(SOURCES
 	include/RE/T/TESRaceForm.h
 	include/RE/T/TESResponse.h
 	include/RE/T/TESSpellList.h
+	include/RE/T/TESTexture.h
 	include/RE/T/TESTopicInfo.h
 	include/RE/T/TESWorldSpace.h
 	include/RE/U/UI.h
 	include/REL/ID.h
 	include/REL/Module.h
 	include/REL/Offset.h
+	include/REL/Pattern.h
+	include/REL/REL.h
 	include/REL/Relocation.h
 	include/REL/Version.h
 	include/SFSE/API.h
@@ -113,89 +161,21 @@ set(SOURCES
 	include/SFSE/Utilities.h
 	include/SFSE/Version.h
 	src/RE/A/Actor.cpp
-	src/RE/A/ActorValueInfo.cpp
-	src/RE/A/ActorValueOwner.cpp
-	src/RE/A/ActorValues.cpp
-	src/RE/B/BGSAttackDataForm.cpp
-	src/RE/B/BGSDestructibleObjectForm.cpp
-	src/RE/B/BGSForcedLocRefType.cpp
-	src/RE/B/BGSKeyword.cpp
 	src/RE/B/BGSKeywordForm.cpp
-	src/RE/B/BGSListForm.cpp
-	src/RE/B/BGSLocation.cpp
-	src/RE/B/BGSLocationRefType.cpp
-	src/RE/B/BGSMod.cpp
-	src/RE/B/BGSNativeTerminalForm.cpp
-	src/RE/B/BGSObjectPlacementDefaults.cpp
-	src/RE/B/BGSOverridePackCollection.cpp
-	src/RE/B/BGSPerk.cpp
-	src/RE/B/BGSPerkRankArray.cpp
-	src/RE/B/BGSPreviewTransform.cpp
-	src/RE/B/BGSPropertySheet.cpp
-	src/RE/B/BGSScene.cpp
-	src/RE/B/BGSSkinForm.cpp
-	src/RE/B/BGSSnapTemplateComponent.cpp
-	src/RE/B/BGSTerminal.cpp
-	src/RE/B/BSFixedString.cpp
-	src/RE/B/BSIntrusiveRefCounted.cpp
-	src/RE/B/BSReflection.cpp
-	src/RE/B/BSStringT.cpp
-	src/RE/B/BSTEvent.cpp
-	src/RE/B/BSTList.cpp
-	src/RE/B/BaseFormComponent.cpp
-	src/RE/C/CombatGroup.cpp
-	src/RE/C/ConsoleLog.cpp
+	src/RE/C/Color.cpp
 	src/RE/F/FormTypes.cpp
-	src/RE/I/IAnimationGraphManagerHolder.cpp
-	src/RE/I/IFunction.cpp
-	src/RE/I/IKeywordFormBase.cpp
-	src/RE/I/IMovementInterface.cpp
-	src/RE/I/INIPrefSettingCollection.cpp
-	src/RE/I/INISettingCollection.cpp
-	src/RE/I/IPostAnimationChannelUpdateFunctor.cpp
-	src/RE/M/MemoryManager.cpp
-	src/RE/M/MenuOpenCloseEvent.cpp
-	src/RE/N/NativeFunction.cpp
-	src/RE/N/NativeFunctionBase.cpp
 	src/RE/N/NiPoint3.cpp
 	src/RE/P/PlayerCamera.cpp
-	src/RE/R/RegSettingCollection.cpp
-	src/RE/S/Script.cpp
-	src/RE/S/SettingCollection.cpp
-	src/RE/S/SettingCollectionList.cpp
-	src/RE/S/SettingCollectionMap.cpp
-	src/RE/S/Settings.cpp
-	src/RE/Starfield.cpp
-	src/RE/T/TBO_InstanceData.cpp
-	src/RE/T/TESAIForm.cpp
-	src/RE/T/TESActorBase.cpp
-	src/RE/T/TESActorBaseData.cpp
-	src/RE/T/TESBoundAnimObject.cpp
-	src/RE/T/TESBoundObject.cpp
-	src/RE/T/TESCamera.cpp
-	src/RE/T/TESContainer.cpp
-	src/RE/T/TESFile.cpp
-	src/RE/T/TESForm.cpp
+	src/RE/P/PlayerCharacter.cpp
 	src/RE/T/TESFormRefCount.cpp
-	src/RE/T/TESFullName.cpp
-	src/RE/T/TESHandleForm.cpp
-	src/RE/T/TESNPC.cpp
-	src/RE/T/TESObject.cpp
-	src/RE/T/TESObjectARMO.cpp
 	src/RE/T/TESObjectCELL.cpp
 	src/RE/T/TESObjectREFR.cpp
-	src/RE/T/TESQuest.cpp
-	src/RE/T/TESRace.cpp
-	src/RE/T/TESRaceForm.cpp
-	src/RE/T/TESResponse.cpp
-	src/RE/T/TESSpellList.cpp
-	src/RE/T/TESTopicInfo.cpp
+	src/RE/T/TESWorldSpace.cpp
 	src/REL/ID.cpp
 	src/REL/Module.cpp
 	src/REL/Version.cpp
 	src/SFSE/API.cpp
 	src/SFSE/IAT.cpp
-	src/SFSE/Impl/PCH.cpp
 	src/SFSE/Impl/WinAPI.cpp
 	src/SFSE/InputMap.cpp
 	src/SFSE/Interfaces.cpp
